@@ -1,8 +1,8 @@
-from flask import Flask, request
-from flask_restful import Resource, Api, fields, reqparse, marshal_with
+from flask import Flask
+from flask_restful import Resource, Api, fields, marshal_with
 from backend.dao.dao_model import DAO
+from backend.endpoint import utils
 import vars
-import utils
 
 app_group = Flask(__name__)
 api = Api(app_group)
@@ -18,7 +18,6 @@ class GetTotalGroupsCount(Resource):
     @marshal_with(response)
     # fetch groups in a paginated manner
     def get(self):
-
         groups_dao_object = DAO(vars.table_names["groups"], logger=app_group.logger)
         total_groups_count, err = groups_dao_object.Count(filter_by="is_deleted = 0")
 
@@ -45,7 +44,8 @@ class GetGroups(Resource):
 
         groups_dao_object = DAO(vars.table_names["groups"], logger=app_group.logger)
         number_of_groups, groups, err = groups_dao_object.GetWithPagination(column="group_id, group_name",
-                                                                            filter_by="is_deleted=0",
+                                                                            filter_by="is_deleted = 0" if args.get(
+                                                                                "show_deleted") is False else "1",
                                                                             limit=args.get("limit"),
                                                                             offset=args.get("offset"))
 

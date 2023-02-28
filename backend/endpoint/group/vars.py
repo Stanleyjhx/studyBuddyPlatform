@@ -11,6 +11,7 @@ table_names = {
 }
 
 GetGroupReqeust = {
+    "show_deleted": bool,
     "limit": int,
     "offset": int,
 }
