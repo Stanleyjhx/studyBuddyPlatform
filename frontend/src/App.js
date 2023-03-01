@@ -2,9 +2,11 @@ import { FileOutlined, PieChartOutlined, UserOutlined, DesktopOutlined, TeamOutl
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import { useState } from 'react';
 import { useNavigate, Routes, Route } from 'react-router-dom'
-import Home from './components/Home/Home';
+import Home from './pages/Home/Home';
+import Group from './pages/Group/Group';
 import './App.css'
 import Navbar from './components/Header/Header';
+import image from './images/campus-background-3.jpg';
 
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
@@ -34,7 +36,11 @@ const App = () => {
   return (
     <Layout
       style={{
-        minHeight: '100vh',
+            //minHeight: '100vh',
+            // backgroundImage: `url(${image})`,
+            // backgroundRepeat: 'no-repeat',
+            //height: '100vh',
+            //margin: '-16 -16px',
       }}
     >
       <Sider className='sidebar' collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -42,7 +48,9 @@ const App = () => {
         </div>
         <Menu theme="dark" defaultSelectedKeys={['/home']} mode="inline" items={items} onClick={onClick}/>
       </Sider>
-      <Layout className="site-layout">
+      <Layout style={{
+            
+          }} className="site-layout">
           <Navbar />
         <Content
           style={{
@@ -52,6 +60,7 @@ const App = () => {
           <Breadcrumb
             style={{
               margin: '16px 0',
+             
             }}
           >
             <Breadcrumb.Item>User</Breadcrumb.Item>
@@ -60,13 +69,14 @@ const App = () => {
           <div
             className='page__content'
             style={{
-              padding: 24,
-              minHeight: 560,
+              minHeight: '100vh',
               background: colorBgContainer,
+              opacity:.7
             }}
           >
-            <Routes>
-              <Route exact path='/home' element={<Home />}></Route>
+            <Routes className='content__detail'>
+              <Route exact path='/home' element={<Home />} className='page__element'></Route>
+              <Route exact path='/group' element={<Group />} className='page__element'></Route>
             </Routes>
           </div>
         </Content>

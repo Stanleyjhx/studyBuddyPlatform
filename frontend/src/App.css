@@ -6,3 +6,13 @@
 .sidebar {
   align-items: center;
 }
+
+.page__element {
+  height: 100%;
+  margin-left: 5%;
+}
+
+.content__detail {
+  align-self: center;
+  align-items: center;
+}
