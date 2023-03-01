@@ -1,19 +1,7 @@
-from enum import Enum
-
-table_names = {
-    "study_plan": "group_study_plan",
-}
-
-
-class FilterType(Enum):
-    FilterByGroupID = 1
-    FilterByStudyPlanID = 2
-
+from backend.endpoint import utils
 
 GetStudyPlanReqeust = {
-    "group_id": int,
-    "study_plan_id": int,
-    "filter_type": FilterType,
+    "order_by": str,
     "limit": int,
     "offset": int,
 }

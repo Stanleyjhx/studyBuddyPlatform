@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restful import Resource, Api, fields, marshal_with
 from backend.dao.dao_model import DAO
 from backend.endpoint import utils
-import vars
+from backend.endpoint.group import vars
 
 app_group = Flask(__name__)
 api = Api(app_group)
@@ -18,7 +18,7 @@ class GetTotalGroupsCount(Resource):
     @marshal_with(response)
     # fetch groups in a paginated manner
     def get(self):
-        groups_dao_object = DAO(vars.table_names["groups"], logger=app_group.logger)
+        groups_dao_object = DAO(utils.table_names["groups"], logger=app_group.logger)
         total_groups_count, err = groups_dao_object.Count(filter_by="is_deleted = 0")
 
         del groups_dao_object
@@ -42,12 +42,17 @@ class GetGroups(Resource):
     def get(self):
         args = utils.get_parser(vars.GetGroupReqeust).parse_args()
 
-        groups_dao_object = DAO(vars.table_names["groups"], logger=app_group.logger)
-        number_of_groups, groups, err = groups_dao_object.GetWithPagination(column="group_id, group_name",
-                                                                            filter_by="is_deleted = 0" if args.get(
-                                                                                "show_deleted") is False else "1",
-                                                                            limit=args.get("limit"),
-                                                                            offset=args.get("offset"))
+        order_by = args.get("order_by")
+        limit = args.get("limit")
+        offset = args.get("offset")
+        show_deleted = args.get("show_deleted")
+
+        groups_dao_object = DAO(utils.table_names["groups"], logger=app_group.logger)
+        number_of_groups, groups, err = groups_dao_object.GetWithPagination(column="group_id, group_name, group_owner, group_description",
+                                                                            filter_by="is_deleted = 0" if show_deleted is False else "1",
+                                                                            limit=limit,
+                                                                            offset=offset,
+                                                                            order_by=order_by if order_by is not None else "1")
 
         del groups_dao_object
 
@@ -71,9 +76,11 @@ class CreateGroup(Resource):
         # fetch groups in a paginated manner
         args = utils.get_parser(vars.CreateGroupReqeust).parse_args()
 
-        groups_dao_object = DAO(vars.table_names["groups"], logger=app_group.logger)
+        group_name = args.get("group_name")
+
+        groups_dao_object = DAO(utils.table_names["groups"], logger=app_group.logger)
         err = groups_dao_object.Insert(value={
-            "group_name": "'{}'".format(args.get("group_name")),
+            "group_name": "'{}'".format(group_name),
             "is_deleted": "false",
         })
 
@@ -94,16 +101,18 @@ class EditGroup(Resource):
         # fetch groups in a paginated manner
         args = utils.get_parser(vars.EditGroupReqeust).parse_args()
 
-        groups_dao_object = DAO(vars.table_names["groups"], logger=app_group.logger)
+        edit_contents = args.get("edit_contents")
 
-        if args.get("edit_type") == vars.EditType.Delete:
-            err = groups_dao_object.Update(value={
-                "is_deleted": "true",
-            }, filter_by="group_id = {}".format(group_id))
+        groups_dao_object = DAO(utils.table_names["groups"], logger=app_group.logger)
 
-        elif args.get("edit_type") == vars.EditType.Edit:
+        if args.get("edit_type") == utils.EditType.Delete:
+            err = groups_dao_object.Update(value={"is_deleted": "true"},
+                                           filter_by="group_id={}".format(group_id))
+
+        elif args.get("edit_type") == utils.EditType.Edit:
             app_group.logger.info(args.get("edit_contents"))
-            err = groups_dao_object.Update(value=args.get("edit_contents"), filter_by="group_id = {}".format(group_id))
+            err = groups_dao_object.Update(value=edit_contents,
+                                           filter_by="group_id = {}".format(group_id))
 
         del groups_dao_object
 
@@ -116,11 +125,3 @@ class EditGroup(Resource):
             "status": 200,
         }
 
-
-api.add_resource(GetTotalGroupsCount, '/get_total_groups_count')
-api.add_resource(GetGroups, '/get_groups')
-api.add_resource(CreateGroup, '/create_group')
-api.add_resource(EditGroup, '/edit_group/<int:group_id>')
-
-if __name__ == '__main__':
-    app_group.run(debug=True)
