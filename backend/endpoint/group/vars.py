@@ -1,18 +1,10 @@
-from enum import Enum
-
-
-class EditType(Enum):
-    Delete = 1
-    Edit = 2
-
-
-table_names = {
-    "groups": "groups",
-}
+from backend.endpoint import utils
 
 GetGroupReqeust = {
+    "show_deleted": bool,
     "limit": int,
     "offset": int,
+    "order_by": str,
 }
 
 CreateGroupReqeust = {
@@ -21,6 +13,6 @@ CreateGroupReqeust = {
 
 EditGroupReqeust = {
     "group_id": str,
-    "edit_type": EditType,
+    "edit_type": utils.EditType,
     "edit_contents": dict,
 }
