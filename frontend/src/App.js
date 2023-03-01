@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home/Home';
 import Group from './pages/Group/Group';
+import GroupDetail from './pages/GroupDetail/GroupDetail' 
 import './App.css'
 import Navbar from './components/Header/Header';
 import image from './images/campus-background-3.jpg';
@@ -77,6 +78,7 @@ const App = () => {
             <Routes className='content__detail'>
               <Route exact path='/home' element={<Home />} className='page__element'></Route>
               <Route exact path='/group' element={<Group />} className='page__element'></Route>
+              <Route exact path='/group_mgmt' element={<GroupDetail />} className='page__element'></Route>
             </Routes>
           </div>
         </Content>
