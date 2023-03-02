@@ -4,6 +4,7 @@ from enum import Enum
 table_names = {
     "groups": "groups",
     "study_plan": "events",
+    "group_members": "group_members",
 }
 
 
@@ -17,8 +18,19 @@ class EditType(Enum):
     Edit = 2
 
 
-def get_parser(params):
+
+def err_response(err):
+    return {
+        "status": 400,
+        "error": "{}".format(str(err)),
+    }
+
+
+def get_parser(params, request_type="get"):
     parser = reqparse.RequestParser()
-    for param, param_type in params.items():
-        parser.add_argument(param, type=param_type)
+    for param_name, param_type in params.items():
+        parser.add_argument(param_name,
+                            type=param_type["type"],
+                            required=True if "required" in param_type else False,
+                            location="args" if request_type == "get" else ['json', 'values'])
     return parser

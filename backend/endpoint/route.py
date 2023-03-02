@@ -1,21 +1,16 @@
-from flask import Flask, request
-from flask_restful import Resource, Api, fields, marshal_with
-from backend.endpoint.group import group
-from backend.endpoint.group_detail import group_detail
+from flask import Flask
+from backend.endpoint.group.group import app_group
+from backend.endpoint.group_detail.group_detail import app_group_detail
+from flask_cors import CORS
 
+# init Flask app
 app = Flask(__name__)
-api = Api(app)
+CORS(app)
 
-# Group Apis
-api.add_resource(group.GetTotalGroupsCount, '/get_total_groups_count')
-api.add_resource(group.GetGroups, '/get_groups')
-api.add_resource(group.CreateGroup, '/create_group')
-api.add_resource(group.EditGroup, '/edit_group/<int:group_id>')
+# register blueprints. ensure that all paths are versioned!
+app.register_blueprint(app_group, url_prefix="/group")
+app.register_blueprint(app_group_detail, url_prefix="/group_detail")
 
-# Group Detail Apis
-api.add_resource(group_detail.GetStudyPlanByGroup, '/get_study_plan_by_group/<int:group_id>')
-api.add_resource(group_detail.GetStudyPlan, '/get_study_plan/<int:study_plan_id>')
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
+    app.run(host='0.0.0.0', port=5000, debug=True)
