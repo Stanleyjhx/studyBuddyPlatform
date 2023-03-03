@@ -1,0 +1,7 @@
+.card__header {
+    display: flex;
+    height: 64px;
+    justify-content: space-between;
+    margin-right: 15px;
+    margin-top: 15px;
+}

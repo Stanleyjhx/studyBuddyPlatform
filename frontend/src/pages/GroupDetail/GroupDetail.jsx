@@ -1,6 +1,6 @@
 import {React, useState}  from 'react';
-import { ScheduleOutlined, TeamOutlined } from '@ant-design/icons';
-import { Tabs } from 'antd';
+import { ScheduleOutlined, TeamOutlined, EditOutlined } from '@ant-design/icons';
+import { Tabs, Button } from 'antd';
 import Icon from '@ant-design/icons/lib/components/Icon';
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -8,8 +8,11 @@ import {
   Card,
   CardContent,
   Typography,
-  CardHeader
+  CardHeader,
+  CardActionArea
 } from "@material-ui/core/";
+import EditPopUp from './EditPopUp';
+import './GroupDetail.css'
 
 const TopTab: React.FC = () => {
   return (
@@ -41,6 +44,41 @@ const TopTab: React.FC = () => {
   )
 };
 
+const StudyPlan = ( {data} ) => {
+  const [visible, setVisible] = useState(false);
+  // open popup
+  const showModal = () => {
+    setVisible(true);
+  };
+
+  return (
+    <Card>
+      <div className='card__header'>
+        <CardHeader
+          title={`Plan Name : ${data.event_name}`}
+          subheader={`Event Description : ${data.event_description}`}
+        />
+        <>
+          <EditOutlined style={{ fontSize:"120%" }} onClick={showModal} />
+          <EditPopUp visible={visible} setVisible={setVisible} data={data}/>
+        </>
+      </div>
+      <CardContent>
+      <div>
+        <Typography>Event Holder: {data.event_holder}</Typography>
+        <Typography>Location: {data.location}</Typography>
+        <Typography
+          color="textSecondary"
+          gutterBottom
+        >
+          {data.start_time} - {data.end_time}
+        </Typography>
+      </div>
+      </CardContent>
+    </Card>
+  )
+};
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -48,18 +86,21 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const StudyPlan = () => {
+const StudyPlanList = () => {
   const classes = useStyles();
   const data = {
     name: [
-      { quarter: 1, earnings: 13000 },
-      { quarter: 2, earnings: 16500 },
-      { quarter: 3, earnings: 14250 },
-      { quarter: 4, earnings: 19000 },
-      { quarter: 5, earnings: 19000 }
+      {event_name: "Study plan 1", event_holder: "Stanley", event_description: "balabala", location: "utown", start_time: "00:00", end_time: "11:11"}
     ],
     id: [1, 2, 3, 4]
   };
+
+  const [visible, setVisible] = useState(false);
+  // open popup
+  const showModal = () => {
+    setVisible(true);
+  };
+
   return (
     <div className={classes.root}>
         <Grid
@@ -69,31 +110,24 @@ const StudyPlan = () => {
           justify="flex-start"
           alignItems="flex-start"
         >
-          {data.name.map((elem) => (
-            <Grid item xs={3} key={data.name.indexOf(elem)}>
-              <Card>
-                <CardHeader
-                  title={`quarter : ${elem.quarter}`}
-                  subheader={`earnings : ${elem.earnings}`}
-                />
-                <CardContent>
-                  <Typography variant="h5" gutterBottom>
-                    Hello World
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+          {data.name.map(function (elem) {
+            return(
+              <Grid item xs={3} key={data.name.indexOf(elem)}>
+                <StudyPlan data={elem}></StudyPlan>
+              </Grid>
+            )
+          })}
         </Grid>
     </div>
   );
-}
+};
 
 const GroupDetail = () => {
+  
   return (
     <div>
       <TopTab />
-      <StudyPlan />
+      <StudyPlanList />
     </div>
   )
 };
