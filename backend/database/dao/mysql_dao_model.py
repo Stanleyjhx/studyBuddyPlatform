@@ -5,6 +5,7 @@ cnx = mysql.connector.connect(user='sbp',
                               host='127.0.0.1',
                               database='sbp')
 
+
 class DAO:
     def __init__(self, table_name, logger, cursor):
         self.table_name = table_name
@@ -32,7 +33,8 @@ class DAO:
         return query
 
     def Update(self, value, filter_by) -> str:
-        update_value_raw = ['{} = "{}"'.format(k, v) if type(v) == str else '{} = {}'.format(k, v) for k, v in value.items()]
+        update_value_raw = ['{} = "{}"'.format(k, v) if type(v) == str else '{} = {}'.format(k, v) for k, v in
+                            value.items()]
         update_value_pair = ",".join(update_value_raw)
         query = """
             UPDATE {}
@@ -44,7 +46,8 @@ class DAO:
 
     def Insert(self, value) -> str:
         insert_col = [k for k, v in value.items()]
-        insert_val = ['"{}"'.format(v.replace("'", "\'")) if type(v) == str else "{}".format(v) for k, v in value.items()]
+        insert_val = ['"{}"'.format(v.replace("'", "\'")) if type(v) == str else "{}".format(v) for k, v in
+                      value.items()]
         query = """
             INSERT INTO {}
             ({})
