@@ -1,10 +1,13 @@
+import os
+
 import mysql.connector
 from flask_restful import Resource, Api, fields, marshal_with
-from backend.dao.dao_model import DAO
+from backend.database.dao.mysql_dao_model import DAO
 from backend.endpoint import utils
 from backend.endpoint.group import vars
-from backend.dao.dao_model import cnx
-from flask import Blueprint, current_app, request
+from backend.database.dao.mysql_dao_model import cnx
+from flask import Blueprint, current_app, request, session
+from backend.database.dao.redis_dao_model import *
 
 app_group = Blueprint(name="app_group", import_name="backend.endpoint.route")
 api_group = Api(app_group)
@@ -20,23 +23,32 @@ class GetTotalGroupsCount(Resource):
     @marshal_with(response)
     # fetch groups in a paginated manner
     def get(self):
-        cursor = cnx.cursor(buffered=True)
-        groups_dao_object = DAO(table_name=utils.table_names["groups"], logger=current_app.logger, cursor=cursor)
-
-        try:
-            cursor.execute(groups_dao_object.Count(filter_by="is_deleted = 0"))
-            cnx.commit()
-            result = {
-                "status": 200,
-                "data": {
-                    "number_of_groups": cursor.fetchone()[0],
-                },
-            }
-            cursor.close()
-            return result
-        except mysql.connector.Error as err:
-            cnx.rollback()
-            return utils.err_response(err)
+        total_groups_count = tredis.get(utils.get_groups_count_key())
+        if total_groups_count is not None:
+            return {
+                    "status": 200,
+                    "data": {
+                        "number_of_groups": int(total_groups_count)
+                    },
+                }
+        else:
+            cursor = cnx.cursor(buffered=True)
+            groups_dao_object = DAO(table_name=utils.table_names["groups"], logger=current_app.logger, cursor=cursor)
+            try:
+                cursor.execute(groups_dao_object.Count(filter_by="is_deleted = 0"))
+                cnx.commit()
+                total_groups_count = cursor.fetchone()[0]
+                cursor.close()
+                tredis.set(utils.get_groups_count_key(), total_groups_count)
+                return {
+                    "status": 200,
+                    "data": {
+                        "number_of_groups": total_groups_count,
+                    },
+                }
+            except mysql.connector.Error as err:
+                cnx.rollback()
+                return utils.err_response(err)
 
 
 class GetGroups(Resource):
@@ -77,6 +89,8 @@ class CreateGroup(Resource):
         args = utils.get_parser(vars.CreateGroupReqeust, "post").parse_args()
 
         group_name = args.get("group_name")
+        token = request.headers.get("Authorization")
+        user_id = utils.validate_session(token.split()[1])
         group_owner = args.get("group_owner")
         group_description = args.get("group_description").replace("'", "\'")
 
@@ -88,7 +102,7 @@ class CreateGroup(Resource):
         try:
             cursor.execute(groups_dao_object.Insert(value={
                 "group_name": group_name,
-                "group_owner": group_owner,
+                "group_owner": user_id,
                 "group_description": group_description,
                 "is_deleted": 0,
             }))
@@ -100,6 +114,7 @@ class CreateGroup(Resource):
             cnx.commit()
             result = vars.CreateGroupResponse(last_row_id)
             cursor.close()
+
             return result
 
         except mysql.connector.Error as err:
@@ -137,6 +152,27 @@ class EditGroup(Resource):
             cnx.rollback()
             cursor.close()
             return utils.err_response("MySQL facing error : {}".format(err))
+
+
+@app_group.before_request
+def before_request():
+    token = request.headers.get("Authorization")
+    if not token:
+        return utils.unauthenticated_response()
+
+    user_id = utils.validate_session(token.split()[1])
+    if user_id is None:
+        return utils.unauthenticated_response()
+    else:
+        setattr(request, "user_id", user_id)
+
+@app_group.after_request
+def after_request(response):
+    response.headers['Access-Control-Allow-Origin'] = utils.react_ip
+    response.headers['Access-Control-Allow-Credentials'] = "true"
+    response.headers['Access-Control-Allow-Method'] = "GET,POST,PUT,DELETE"
+    response.headers['Access-Control-Allow-Headers'] = "Origin,Authorization"
+    return response
 
 
 # Group Apis
