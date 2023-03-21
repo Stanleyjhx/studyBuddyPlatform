@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import image from '../../images/campus-background-3.jpg';
 
 const Home = () => {
     return (
