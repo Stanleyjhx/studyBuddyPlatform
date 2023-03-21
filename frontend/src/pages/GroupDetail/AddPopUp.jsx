@@ -1,27 +1,38 @@
 import { react, useState } from 'react';
 import { Form, Input, Modal, Select, TimePicker, DatePicker, Button } from 'antd';
 
-const EditPopUp = ({ visible, setVisible, data }) => {
+const AddPopUp = ({ addVisible, setAddVisible }) => {
     const [form] = Form.useForm();
 
     const handleOk = () => {
       // handle form submission here
-      setVisible(false);
+      setAddVisible(false);
     };
 
     const handleCancel = () => {
-      setVisible(false);
+      setAddVisible(false);
     };
-    const onSubmit = (values) =>{
-      console.log(values)
-      //await  fetch ...
-      form.resetFields();
-      // close()
-    }
+    // // 提交后获取表单数据，请求接口，重置表单并关闭
+    const onSubmit = (values) => {
+      try {
+        const response =  fetch("https://baidu.com", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        });
+        if (response.status != 200) {
+          throw new Error('Failed to create study plan');
+          alert("Create study plan failed")
+        }
 
-    const handleDeleteForm = () => {
-      return;
-    }
+        setAddVisible(false);
+      } catch (err) {
+        console.error(err);
+        alert(err);
+      }
+    };
   
     return (
       <div>
@@ -31,8 +42,8 @@ const EditPopUp = ({ visible, setVisible, data }) => {
             cancelButtonProps={{ shape: 'round' }}
             okButtonProps={{ shape: 'round' }}
             width={600}
-            visible={visible}
-            title="Edit Study Plan" 
+            visible={addVisible}
+            title="Create Study Plan" 
             onCancel={handleCancel}
             autoFocusButton="OK" 
             onOk={handleOk}
@@ -55,7 +66,7 @@ const EditPopUp = ({ visible, setVisible, data }) => {
               </Form.Item>
               <Form.Item
                 label="Location"
-                name="location"
+                name="depart"
                 rules={[{ required: true, message: 'Please input location!' }]}
               >
                 <Select>
@@ -86,11 +97,10 @@ const EditPopUp = ({ visible, setVisible, data }) => {
                 <TimePicker format={'HH:mm'}/>
               </Form.Item>
             </Form>
-            <Button type='primary' danger onclick={handleDeleteForm}>Delete Plan</Button>
           </div>
         </Modal>
       </div>
     )
 };
 
-export default EditPopUp;
+export default AddPopUp;

@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useNavigate, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home/Home';
 import Group from './pages/Group/Group';
-import GroupDetail from './pages/GroupDetail/GroupDetail' 
+import GroupDetail from './pages/GroupDetail/GroupDetail'; 
+import Members from './pages/GroupDetail/Members';
 import './App.css'
 import Navbar from './components/Header/Header';
-import image from './images/campus-background-3.jpg';
 
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
@@ -22,7 +22,7 @@ const items = [
   getItem('Home', '/home', <HomeOutlined />),
   getItem('Profile', '/profile', <UserOutlined />),
   getItem('Group', '/group', <TeamOutlined />),
-  getItem('Group Management', '/group_mgmt', <DesktopOutlined />),
+  getItem('Group Management', '/group_mgmt/plans', <DesktopOutlined />),
 ];
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -35,15 +35,7 @@ const App = () => {
     token: { colorBgContainer },
   } = theme.useToken();
   return (
-    <Layout
-      style={{
-            //minHeight: '100vh',
-            // backgroundImage: `url(${image})`,
-            // backgroundRepeat: 'no-repeat',
-            //height: '100vh',
-            //margin: '-16 -16px',
-      }}
-    >
+    <Layout>
       <Sider className='sidebar' collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
         <div className='sidebar__title' >
         </div>
@@ -78,7 +70,8 @@ const App = () => {
             <Routes className='content__detail'>
               <Route exact path='/home' element={<Home />} className='page__element'></Route>
               <Route exact path='/group' element={<Group />} className='page__element'></Route>
-              <Route exact path='/group_mgmt' element={<GroupDetail />} className='page__element'></Route>
+              <Route exact path='/group_mgmt/plans' element={<GroupDetail />} className='page__element'></Route>
+              <Route exact path='/group_mgmt/members' element={<Members />} className='page_element'></Route>
             </Routes>
           </div>
         </Content>

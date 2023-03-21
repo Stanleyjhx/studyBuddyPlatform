@@ -1,6 +1,7 @@
 import {React, useState}  from 'react';
-import { ScheduleOutlined, TeamOutlined, EditOutlined } from '@ant-design/icons';
+import { ScheduleOutlined, TeamOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
 import { Tabs, Button } from 'antd';
+import { useNavigate } from 'react-router-dom'
 import Icon from '@ant-design/icons/lib/components/Icon';
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -12,37 +13,47 @@ import {
   CardActionArea
 } from "@material-ui/core/";
 import EditPopUp from './EditPopUp';
+import AddPopUp from './AddPopUp';
+import TopTab from './TopTab';
 import './GroupDetail.css'
 
-const TopTab: React.FC = () => {
-  return (
-      <Tabs
-  defaultActiveKey="1"
-  items={
-    [
-      {
-        label: (
-          <span>
-            <ScheduleOutlined />
-            Study Plan
-          </span>
-        ),
-        key: "1",
-      },
-      {
-        label: (
-          <span>
-            <TeamOutlined />
-            Group Members
-          </span>
-        ),
-        key: "2",
-      }
-    ]
-  }
-/>
-  )
-};
+// const TopTab: React.FC = () => {
+//   let history = useNavigate();
+
+//   const handleTabClick = (key) => {
+//     history.push(`/${key}`)
+//   }
+//   return (
+//     <Tabs
+//       onChange={(key) => {
+//         history(`/group_mgmt/${key}`);
+//       }}
+//       defaultActiveKey="plans"
+//       items={
+//         [
+//           {
+//             label: (
+//               <span>
+//                 <ScheduleOutlined />
+//                 Study Plan
+//               </span>
+//             ),
+//             key: "plans",
+//           },
+//           {
+//             label: (
+//               <span>
+//                 <TeamOutlined />
+//                 Group Members
+//               </span>
+//             ),
+//             key: "members",
+//           }
+//         ]
+//       }
+//     />
+//   )
+// };
 
 const StudyPlan = ( {data} ) => {
   const [visible, setVisible] = useState(false);
@@ -55,7 +66,7 @@ const StudyPlan = ( {data} ) => {
     <Card>
       <div className='card__header'>
         <CardHeader
-          title={`Plan Name : ${data.event_name}`}
+          title={`${data.event_name}`}
           subheader={`Event Description : ${data.event_description}`}
         />
         <>
@@ -123,10 +134,18 @@ const StudyPlanList = () => {
 };
 
 const GroupDetail = () => {
-  
+  const [addVisible, setAddVisible] = useState(false);
+  // open popup
+  const showAddModal = () => {
+    setAddVisible(true);
+  };
   return (
     <div>
-      <TopTab />
+      <header className='detail__header'>
+        <TopTab tab={"plans"}/>
+        <FileAddOutlined style={{fontSize: "150%"}} onClick={showAddModal}/>
+      </header>
+      <AddPopUp setAddVisible={setAddVisible} addVisible={addVisible}/>
       <StudyPlanList />
     </div>
   )

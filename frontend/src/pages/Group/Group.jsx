@@ -2,6 +2,8 @@ import { React, useState, useEffect }  from 'react';
 import { LikeOutlined, MessageOutlined, StarOutlined, TeamOutlined } from '@ant-design/icons';
 import { Avatar, List, Space } from 'antd';
 import Loader from '../../components/Loader';
+import {useCookies} from 'react-cookie';
+import { fetchToCurl } from 'fetch-to-curl';
 
 const data2 = [
   {
@@ -39,18 +41,24 @@ const body = {
 }
 
 const Group: React.FC = () => {
+  const [cookies, setCookie, removeCookie] = useCookies(['session_id'])
   const [actualData, setData] = useState(null);
   const [err, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setCookie("session_id","8a60dd31-1ef8-4a50-ac77-1f78c365ac9e",{path:'/'},{domain:'192.168.0.132'})
     fetch("http://192.168.0.132:5000/group/get_groups?limit=0&offset=100",{
-      method: "GET",
-      header: {"Content-type": "application/json"}
+      method: "get",
+      credentials: "include",
+      mode: "cors",
+      headers: {"Content-Type": "application/json", "Authorization": "Bearer 8a60dd31-1ef8-4a50-ac77-1f78c365ac9e"},
     })
     .then((res) => res.json())
     .then((data) => setData(data));
   }, []);
+
+  
 
     // const fetchData = async () => {
     //     try {
@@ -74,9 +82,9 @@ const Group: React.FC = () => {
     //     }  
     // }
 
-    if (actualData == undefined) {
-        return <Loader />
-    }
+    // if (actualData == undefined) {
+    //     return <Loader />
+    // }
     return (
         <List
         itemLayout="vertical"
@@ -88,7 +96,8 @@ const Group: React.FC = () => {
         pageSize: 4,
         align: "center"
         }}
-        dataSource={actualData.data.groups}
+        // dataSource={actualData.data.groups}
+        dataSource={data2}
         renderItem={(item) => (
         <List.Item
             key={item.group_name}
