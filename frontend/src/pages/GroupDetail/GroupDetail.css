@@ -1,7 +1,9 @@
 .card__header {
     display: flex;
     height: 64px;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-inline: 15px;
     margin-right: 15px;
     margin-top: 15px;
 }
@@ -11,4 +13,9 @@
     height: 64px;
     justify-content: space-between;
     padding: 10px;
+}
+
+.group__overview {
+    display: flex;
+    justify-content: space-between;
 }

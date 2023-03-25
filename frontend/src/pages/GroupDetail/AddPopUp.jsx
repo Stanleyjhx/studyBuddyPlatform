@@ -1,100 +1,132 @@
 import { react, useState } from 'react';
-import { Form, Input, Modal, Select, TimePicker, DatePicker, Button } from 'antd';
+import { Form, Input, Modal, Select, TimePicker, DatePicker, Button, InputNumber } from 'antd';
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import timezone from 'dayjs/plugin/timezone'
+import axios from 'axios';
+import moment from 'moment';
+import cookie from 'react-cookies';
 
-const AddPopUp = ({ addVisible, setAddVisible }) => {
+const { RangePicker } = DatePicker;
+dayjs.extend(customParseFormat)
+dayjs.extend(timezone)
+dayjs.tz.setDefault("Asia/Singapore")
+
+const sessionID = cookie.load("session_id")
+const showTimeFormat = 'YYYY-MM-DD HH:mm'
+
+const AddPopUp = ({ addVisible, setAddVisible, groupId}) => {
     const [form] = Form.useForm();
-
+    const config = {
+      headers: { Authorization: `Bearer ${sessionID}` }
+    };
+    const onCapacityChange = (value: number) => {
+      console.log('changed', value);
+    };
     const handleOk = () => {
       // handle form submission here
-      setAddVisible(false);
+      form.validateFields().then((values) => {
+        // customize post body
+        const requestBody = {
+          start_time : values.event_time[0].format(showTimeFormat),
+          end_time : values.event_time[1].format(showTimeFormat),
+          event_name : values.event_name,
+          description : values.event_description,
+          capacity : values.capacity,
+          location : values.location
+        }
+        console.log(requestBody.start_time);
+        axios.post(`http://192.168.0.132:5000/group_detail/create_study_plan/${groupId}`, requestBody, config)
+          .then((response) => {
+            console.log('Post created successfully!', response.data);
+            setAddVisible(false);
+            form.resetFields();
+            window.location.reload(false)
+          })
+          .catch((error) => {
+            console.error('Error editing study plan', error);
+          });
+      })
     };
 
     const handleCancel = () => {
       setAddVisible(false);
     };
-    // // 提交后获取表单数据，请求接口，重置表单并关闭
-    const onSubmit = (values) => {
-      try {
-        const response =  fetch("https://baidu.com", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        });
-        if (response.status != 200) {
-          throw new Error('Failed to create study plan');
-          alert("Create study plan failed")
-        }
+    const [buttonDisabled, setButtonDisabled] = useState(true);
 
-        setAddVisible(false);
-      } catch (err) {
-        console.error(err);
-        alert(err);
-      }
-    };
   
     return (
       <div>
         <Modal 
-            wrapClassName="modal-wrap"
-            okText="Confirm"
-            cancelButtonProps={{ shape: 'round' }}
-            okButtonProps={{ shape: 'round' }}
-            width={600}
-            visible={addVisible}
-            title="Create Study Plan" 
-            onCancel={handleCancel}
-            autoFocusButton="OK" 
-            onOk={handleOk}
+          wrapClassName="modal-wrap"
+          okText="Confirm"
+          cancelButtonProps={{ shape: 'round' }}
+          okButtonProps={{ shape: 'round' }}
+          width={600}
+          visible={addVisible}
+          title="Create Study Plan" 
+          onCancel={handleCancel}
+          autoFocusButton="OK" 
+          onOk={handleOk}
         >
-          <div className="form">
-            <Form form={form} labelCol={{ span: 5 }} wrapperCol={{ span: 16 }} onFinish={onSubmit}>
+         <div className="form">
+            <Form 
+              form={form} 
+              labelCol={{ span: 5 }} 
+              wrapperCol={{ span: 16 }} 
+              onFieldsChange={() =>
+                setButtonDisabled(
+                  form.getFieldsError().some((field) => field.errors.length > 0)
+                )
+              }
+            >
               <Form.Item
                 label="Event Name"
-                name="eventname"
-                rules={[{ required: true, message: 'Please input event name!' }]}
+                name="event_name"
+                rules={[
+                  { required: true, message: 'Please input event name!' },
+                  {
+                    max: 24,
+                    message: "Event name should be less than 25 character",
+                  },
+                ]}
               >
-                <Input />
+                <Input maxLength={25}/>
               </Form.Item>
               <Form.Item
                 label="Description"
-                name="eventdesc"
-                rules={[{ required: true, message: 'Please input description!' }]}
+                name="event_description"
+                rules={[
+                  { required: true, message: 'Please input description!' },
+                  {
+                    max: 50,
+                    message: "Description should be less than 50 character",
+                  },
+                ]}
               >
                 <Input />
               </Form.Item>
               <Form.Item
+                label="Capacity"
+                name="capacity"
+                rules={[{ required: true, message: 'Please input capacity!' }]}
+              >
+                <InputNumber min={1} max={1000} defaultValue={10} onChange={onCapacityChange} />
+              </Form.Item>
+              <Form.Item
                 label="Location"
-                name="depart"
+                name="location"
                 rules={[{ required: true, message: 'Please input location!' }]}
               >
-                <Select>
-                  <Select.Option value={1}>Science Library</Select.Option>
-                  <Select.Option value={2}>Utown</Select.Option>
-                  <Select.Option value={3}>Central Library</Select.Option>
-                </Select>
+                <Input />
               </Form.Item>
+             
               <Form.Item
-                label="Date"
-                name="end"
-                rules={[{ required: true, message: 'Please input end time!' }]}
+                label="Event time"
+                name="event_time"
+                rules={[{ required: true, message: 'Please input event time!' }]}
               >
-                <DatePicker />
-              </Form.Item>
-              <Form.Item
-                label="Start-time"
-                name="start"
-                rules={[{ required: true, message: 'Please input start time!' }]}
-              >
-                <TimePicker format={'HH:mm'}/>
-              </Form.Item>
-              <Form.Item
-                label="End-time"
-                name="end"
-                rules={[{ required: true, message: 'Please input end time!' }]}
-              >
-                <TimePicker format={'HH:mm'}/>
+                <RangePicker showTime /> 
               </Form.Item>
             </Form>
           </div>

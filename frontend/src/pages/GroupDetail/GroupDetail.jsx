@@ -1,9 +1,25 @@
-import {React, useState}  from 'react';
-import { ScheduleOutlined, TeamOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
-import { Tabs, Button } from 'antd';
-import { useNavigate } from 'react-router-dom'
+import {React, useState, useEffect}  from 'react';
+import { 
+  TeamOutlined, 
+  EditOutlined, 
+  FileAddOutlined, 
+  DeleteOutlined, 
+  ReadFilled, 
+  UserOutlined, 
+  HomeFilled, 
+  EnvironmentFilled, 
+  ApartmentOutlined,
+  ClockCircleFilled,
+  EllipsisOutlined,
+  SettingOutlined
+} from '@ant-design/icons';
+import { Tabs, Button, Tag, Tooltip, Descriptions } from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 import Icon from '@ant-design/icons/lib/components/Icon';
 import { makeStyles } from "@material-ui/core/styles";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
   Grid,
   Card,
@@ -15,74 +31,77 @@ import {
 import EditPopUp from './EditPopUp';
 import AddPopUp from './AddPopUp';
 import TopTab from './TopTab';
-import './GroupDetail.css'
+import DeletePopUp from './DeletePopUp';
+import './GroupDetail.css';
+import Loader from '../../components/Loader';
+import cookie from 'react-cookies';
 
-// const TopTab: React.FC = () => {
-//   let history = useNavigate();
+const { Meta } = Card;
 
-//   const handleTabClick = (key) => {
-//     history.push(`/${key}`)
-//   }
-//   return (
-//     <Tabs
-//       onChange={(key) => {
-//         history(`/group_mgmt/${key}`);
-//       }}
-//       defaultActiveKey="plans"
-//       items={
-//         [
-//           {
-//             label: (
-//               <span>
-//                 <ScheduleOutlined />
-//                 Study Plan
-//               </span>
-//             ),
-//             key: "plans",
-//           },
-//           {
-//             label: (
-//               <span>
-//                 <TeamOutlined />
-//                 Group Members
-//               </span>
-//             ),
-//             key: "members",
-//           }
-//         ]
-//       }
-//     />
-//   )
-// };
+dayjs.extend(customParseFormat)
+dayjs.tz.setDefault("Asia/Singapore")
+dayjs.extend(customParseFormat)
+
+const showTimeFormat = 'YYYY-MM-DD HH:mm';
+const sessionID = cookie.load("session_id");
+
+const config = {
+  headers: { Authorization: `Bearer ${sessionID}` }
+};
 
 const StudyPlan = ( {data} ) => {
   const [visible, setVisible] = useState(false);
+  const [deleteVisible, setDeleteVisible] = useState(false);
   // open popup
   const showModal = () => {
     setVisible(true);
   };
 
+  const showDeleteModal = () => {
+    setDeleteVisible(true);
+  }
+  
   return (
-    <Card>
-      <div className='card__header'>
-        <CardHeader
-          title={`${data.event_name}`}
-          subheader={`Event Description : ${data.event_description}`}
-        />
-        <>
-          <EditOutlined style={{ fontSize:"120%" }} onClick={showModal} />
+    <Card style={{overflow:"scroll", height:"450px"}}>
+      <div className='card__header' style={{height:"5%"}}>
+        {(data.is_deleted != 1) && <div className='edit__plan'>
+          <Tooltip title="Edit Study Plan">
+            <span><EditOutlined style={{ fontSize:"120%" }} onClick={showModal} /></span>
+          </Tooltip>
           <EditPopUp visible={visible} setVisible={setVisible} data={data}/>
-        </>
+        </div>}
+        {(data.is_deleted != 1) && <div className='delete__plan'>
+          <Tooltip title="Cancel Study Plan">
+            <span><DeleteOutlined style={{ fontSize:"120%" }} onClick={showDeleteModal} /></span>
+          </Tooltip>
+          <DeletePopUp visible={deleteVisible} setVisible={setDeleteVisible} data={data}/>
+        </div>}
+        {(data.is_deleted == 1) && <Tag color="red">Canceled</Tag>}
       </div>
-      <CardContent>
+      <CardHeader
+        title={`${data.event_name}`}
+        subheader={`${data.event_description}`}
+        style={{height:"40%"}}
+      />
+      <CardContent style={{height:"55%"}}>
       <div>
-        <Typography>Event Holder: {data.event_holder}</Typography>
-        <Typography>Location: {data.location}</Typography>
+        <Typography>
+          <UserOutlined />{"\t"}Event Holder:{"\t"} 
+          {data.event_holder.first_name + " " + data.event_holder.last_name}
+        </Typography>
+        <Typography>
+          <EnvironmentFilled />{"\t"}Location: {"\t"}{data.location}
+        </Typography>
+        <Typography>
+          <ApartmentOutlined />{"\t"}Capacity: {"\t"}{data.capacity}
+        </Typography>
+        <p/>
         <Typography
           color="textSecondary"
           gutterBottom
         >
-          {data.start_time} - {data.end_time}
+          <ClockCircleFilled />{"\t"}
+          {dayjs(data.start_time).format(showTimeFormat)} - {dayjs(data.end_time).format(showTimeFormat)}
         </Typography>
       </div>
       </CardContent>
@@ -97,14 +116,27 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const StudyPlanList = () => {
+const StudyPlanList = ( {groupId} ) => {
   const classes = useStyles();
-  const data = {
-    name: [
-      {event_name: "Study plan 1", event_holder: "Stanley", event_description: "balabala", location: "utown", start_time: "00:00", end_time: "11:11"}
-    ],
-    id: [1, 2, 3, 4]
-  };
+  const [planList, setPlanlist] = useState(null);
+  const [cachedData, setCachedData] = useState(null);
+
+  useEffect(() => {
+    if (cachedData) {
+      setPlanlist(cachedData);
+      return;
+    }
+    const fetchData = async () => {
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/group_detail/get_study_plan_by_group/${groupId}?limit=0&offset=10&show_deleted=true&order_by=is_deleted`,
+        config
+      );
+      setPlanlist(res.data.data.study_plan);
+      setCachedData(res.data.data.study_plan);
+      console.log(res.data.data.study_plan)
+    };
+    fetchData();
+  }, []);
 
   const [visible, setVisible] = useState(false);
   // open popup
@@ -112,41 +144,65 @@ const StudyPlanList = () => {
     setVisible(true);
   };
 
+  if (planList == undefined) {
+    return <Loader/>
+  }
+
+  if (planList.length == 0) {
+    return <Typography>No Data Available</Typography>
+  }
+
   return (
     <div className={classes.root}>
-        <Grid
-          container
-          spacing={2}
-          direction="row"
-          justify="flex-start"
-          alignItems="flex-start"
-        >
-          {data.name.map(function (elem) {
-            return(
-              <Grid item xs={3} key={data.name.indexOf(elem)}>
-                <StudyPlan data={elem}></StudyPlan>
-              </Grid>
-            )
-          })}
-        </Grid>
+      <Grid
+        container
+        spacing={3}
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+      >
+        {planList.map(function (elem) {
+          return(
+            <Grid item xs={4} key={planList.indexOf(elem)}>
+              <StudyPlan data={elem}></StudyPlan>
+            </Grid>
+          )
+        })}
+      </Grid>
     </div>
   );
 };
 
-const GroupDetail = () => {
+const GroupDetail = ( props ) => {
   const [addVisible, setAddVisible] = useState(false);
+  const [groupOverview, setGroupOverview] = useState({});
+  const params = useParams();
+  const groupId = params.id;
   // open popup
   const showAddModal = () => {
     setAddVisible(true);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await axios.get(
+        `http://192.168.0.132:5000/group/get_groups?limit=0&offset=100&group_id=${groupId}`,
+        config
+      );
+      setGroupOverview(res.data.data.groups[0]);
+      console.log(groupOverview);
+    };
+    fetchData();
+  }, []);
+
   return (
-    <div>
+    <div style={{overflow:"scroll", height:"1000px"}}>
       <header className='detail__header'>
-        <TopTab tab={"plans"}/>
+        <TopTab tab={"plans"} groupId={groupId}/>
         <FileAddOutlined style={{fontSize: "150%"}} onClick={showAddModal}/>
       </header>
-      <AddPopUp setAddVisible={setAddVisible} addVisible={addVisible}/>
-      <StudyPlanList />
+      <AddPopUp setAddVisible={setAddVisible} addVisible={addVisible} groupId={groupId}/>
+      <StudyPlanList groupId={groupId}/>
     </div>
   )
 };
