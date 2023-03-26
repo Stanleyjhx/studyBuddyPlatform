@@ -12,6 +12,15 @@ GetGroupReqeust = {
     "order_by": {
         "type": str
     },
+    "show_deleted": {
+        "type": bool
+    },
+    "group_id": {
+        "type": int,
+    },
+    "show_mygroup": {
+        "type": bool,
+    },
 }
 
 
@@ -30,27 +39,15 @@ CreateGroupReqeust = {
         "type": str,
         "required": True,
     },
-    "group_owner": {
-        "type": int,
-        "required": True,
-
-    },
     "group_description": {
         "type": str,
         "required": True,
     },
+    "module_tag": {
+        "type": str
+    },
 
 }
-
-
-def CreateGroupResponse(last_row_id):
-    return {
-        "status": 200,
-        "data": {
-            "group_id": last_row_id
-        }
-    }
-
 
 EditGroupReqeust = {
     "edit_type": {
@@ -63,8 +60,50 @@ EditGroupReqeust = {
     },
 }
 
+ApproveRequest = {
+    "status": {
+        "type": utils.ApprovalStatus,
+        "required": True,
+    }
+}
 
-def EditGroupResponse():
+ApplyRequest = {
+    "apply_reason": {
+        "type": str,
+        "required": True,
+    }
+}
+
+GetRequestsRequest = {
+    "role_type": {
+        "type": utils.ApprovalRoleType,
+        "required": True,
+    },
+    "limit": {
+        "type": int,
+        "required": True,
+    },
+    "offset": {
+        "type": int,
+        "required": True,
+    },
+    "order_by": {
+        "type": str
+    },
+    "status": {
+        "type": utils.ApprovalStatus,
+    }
+}
+
+
+def GetRequestsResponse(number_of_requests, requests, title="number_of_groups"):
     return {
         "status": 200,
+        "data": {
+            title: number_of_requests,
+            "requests": requests,
+        },
     }
+
+
+

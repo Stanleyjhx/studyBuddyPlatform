@@ -1,16 +1,11 @@
 import mysql.connector
 
-cnx = mysql.connector.connect(user='sbp',
-                              password='sbp',
-                              host='127.0.0.1',
-                              database='sbp')
 
 
 class DAO:
-    def __init__(self, table_name, logger, cursor):
+    def __init__(self, table_name, logger, cursor=None):
         self.table_name = table_name
         self.logger = logger
-        self.cursor = cursor
 
     def Get(self, column, filter_by) -> str:
         query = """
