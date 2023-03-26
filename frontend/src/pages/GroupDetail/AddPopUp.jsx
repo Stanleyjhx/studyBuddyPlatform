@@ -36,7 +36,7 @@ const AddPopUp = ({ addVisible, setAddVisible, groupId}) => {
           location : values.location
         }
         console.log(requestBody.start_time);
-        axios.post(`http://192.168.0.132:5000/group_detail/create_study_plan/${groupId}`, requestBody, config)
+        axios.post(`${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/group_detail/create_study_plan/${groupId}`, requestBody, config)
           .then((response) => {
             console.log('Post created successfully!', response.data);
             setAddVisible(false);
@@ -99,8 +99,8 @@ const AddPopUp = ({ addVisible, setAddVisible, groupId}) => {
                 rules={[
                   { required: true, message: 'Please input description!' },
                   {
-                    max: 50,
-                    message: "Description should be less than 50 character",
+                    max: 149,
+                    message: "Description should be less than 150 character",
                   },
                 ]}
               >
@@ -109,7 +109,7 @@ const AddPopUp = ({ addVisible, setAddVisible, groupId}) => {
               <Form.Item
                 label="Capacity"
                 name="capacity"
-                rules={[{ required: true, message: 'Please input capacity!' }]}
+              
               >
                 <InputNumber min={1} max={1000} defaultValue={10} onChange={onCapacityChange} />
               </Form.Item>

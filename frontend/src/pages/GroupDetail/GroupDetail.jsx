@@ -11,10 +11,11 @@ import {
   ApartmentOutlined,
   ClockCircleFilled,
   EllipsisOutlined,
-  SettingOutlined
+  SettingOutlined,
+  PlusCircleTwoTone
 } from '@ant-design/icons';
 import { Tabs, Button, Tag, Tooltip, Descriptions } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import Icon from '@ant-design/icons/lib/components/Icon';
 import { makeStyles } from "@material-ui/core/styles";
@@ -76,10 +77,15 @@ const StudyPlan = ( {data} ) => {
           </Tooltip>
           <DeletePopUp visible={deleteVisible} setVisible={setDeleteVisible} data={data}/>
         </div>}
-        {(data.is_deleted == 1) && <Tag color="red">Canceled</Tag>}
+        <Tooltip title="This event was canceled">{(data.is_deleted == 1) && <Tag color="red">Canceled</Tag>}</Tooltip>
+        <Tooltip title="You are already in this event">{(data.is_a_member == 1) && <Tag color="blue">Joined</Tag>}</Tooltip>
       </div>
       <CardHeader
-        title={`${data.event_name}`}
+        title={
+          <Link to={`/group_detail/plan_detail/${data.event_id}`} >
+            <a>{data.event_name}</a>
+          </Link>
+          }
         subheader={`${data.event_description}`}
         style={{height:"40%"}}
       />
@@ -120,6 +126,11 @@ const StudyPlanList = ( {groupId} ) => {
   const classes = useStyles();
   const [planList, setPlanlist] = useState(null);
   const [cachedData, setCachedData] = useState(null);
+  const [addVisible, setAddVisible] = useState(false);
+
+  const showAddModal = () => {
+    setAddVisible(true);
+  };
 
   useEffect(() => {
     if (cachedData) {
@@ -154,6 +165,11 @@ const StudyPlanList = ( {groupId} ) => {
 
   return (
     <div className={classes.root}>
+      <header className='detail__header' style={{display:"flex", justifyContent:"flex-end"}}>
+        <Button onClick={showAddModal} type="primary">
+        <PlusCircleTwoTone style={{fontSize: "120%"}} /> Create Your Study Plan!</Button>
+      </header>
+      <AddPopUp setAddVisible={setAddVisible} addVisible={addVisible} groupId={groupId}/>
       <Grid
         container
         spacing={3}
@@ -199,9 +215,7 @@ const GroupDetail = ( props ) => {
     <div style={{overflow:"scroll", height:"1000px"}}>
       <header className='detail__header'>
         <TopTab tab={"plans"} groupId={groupId}/>
-        <FileAddOutlined style={{fontSize: "150%"}} onClick={showAddModal}/>
       </header>
-      <AddPopUp setAddVisible={setAddVisible} addVisible={addVisible} groupId={groupId}/>
       <StudyPlanList groupId={groupId}/>
     </div>
   )

@@ -20,7 +20,7 @@ const AddGroupPopUp = ({ addVisible, setAddVisible }) => {
         module_tags: values.module_tags.toString()
       };
 
-      axios.post(`${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/group/create_group`, values, config)
+      axios.post(`${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/group/create_group`, requestBody, config)
         .then((response) => {
           console.log('Post created successfully!', response.data);
           setAddVisible(false);
@@ -90,12 +90,12 @@ const AddGroupPopUp = ({ addVisible, setAddVisible }) => {
               rules={[
                 { required: true, message: 'Please input group name!' },
                 {
-                  max: 19,
-                  message: "Group name should be less than 20 character",
+                  max: 29,
+                  message: "Group name should be less than 30 character",
                 },
               ]}
             >
-              <Input maxLength={20}/>
+              <Input maxLength={30}/>
             </Form.Item>
             <Form.Item
               label="Description"

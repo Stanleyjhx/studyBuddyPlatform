@@ -7,6 +7,7 @@ import Group from './pages/Group/Group';
 import GroupDetail from './pages/GroupDetail/GroupDetail'; 
 import Members from './pages/GroupDetail/Members';
 import GroupInfo from './pages/GroupDetail/GroupInfo';
+import StudyPlanDetail from './pages/GroupDetail/StudyPlan/StudyPlanDetail';
 import './App.css'
 import Navbar from './components/Header/Header';
 
@@ -69,6 +70,7 @@ const App = () => {
               <Route exact path='/group_detail/plans/:id' element={<GroupDetail />} className='page__element'></Route>
               <Route exact path='/group_detail/members/:id' element={<Members />} className='page__element'></Route>
               <Route exact path='/group_detail/info/:id' element={<GroupInfo />} className='page__element'></Route>
+              <Route exact path='/group_detail/plan_detail/:id' element={<StudyPlanDetail />} className='page__element'></Route>
             </Routes>
           </div>
         </Content>

@@ -14,6 +14,7 @@ const GroupInfo: React.FC = () => {
   const [err, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [editGroupVisible, setEditGroupVisible] = useState(false);
+  const [isMember, setIsMember] = useState(false);
 
   const sessionID = cookie.load("session_id");
   const config = {
@@ -41,6 +42,7 @@ const GroupInfo: React.FC = () => {
       );
       setGroupInfo(res.data.data.groups[0]);
       setCachedData(res.data.data.groups[0]);
+      setIsMember(res.data.data.groups[0].is_a_member);
     };
     fetchData();
   }, []); 
@@ -61,8 +63,8 @@ const GroupInfo: React.FC = () => {
           <TopTab tab={"members"} groupId={groupId}/>
       </header>
       <div className='card__header' style={{height:"5%"}}>
-        <Tooltip title="Only Group Owners Can Edit Group Information">
-            <Button onClick={showEditGroupModal} ><EditOutlined style={{ fontSize:"120%" }} /> Edit Group Information</Button>
+        <Tooltip title="Only Group Members Can Edit Group Information">
+            <Button onClick={showEditGroupModal} disabled={!isMember}><EditOutlined style={{ fontSize:"120%" }} /> Edit Group Information</Button>
           </Tooltip>
           <EditGroupPopUp visible={editGroupVisible} setVisible={setEditGroupVisible} data={groupInfo}/>
         </div>

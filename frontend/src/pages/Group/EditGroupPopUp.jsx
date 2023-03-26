@@ -102,12 +102,12 @@ const EditGroupPopUp = ({ visible, setVisible, data }) => {
               rules={[
                 { required: false, message: 'Please input group name!' },
                 {
-                  max: 19,
-                  message: "Group name should be less than 20 character",
+                  max: 29,
+                  message: "Group name should be less than 30 character",
                 },
               ]}
             >
-              <Input maxLength={20}/>
+              <Input maxLength={30}/>
             </Form.Item>
             <Form.Item
               label="Description"

@@ -41,7 +41,7 @@ const EditPopUp = ({ visible, setVisible, data }) => {
     useEffect(() => {
       const fetchData = async () => {
         const res = await axios.get(
-          `http://192.168.0.132:5000/group_detail/get_study_plan_by_id/${data.event_id}`,
+          `${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/group_detail/get_study_plan_by_id/${data.event_id}`,
           config
         );
       };
@@ -66,7 +66,7 @@ const EditPopUp = ({ visible, setVisible, data }) => {
           }
         }
         console.log(requestBody.sra)
-        axios.post(`http://192.168.0.132:5000/group_detail/edit_study_plan/${data.event_id}`, requestBody, config)
+        axios.post(`${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/group_detail/edit_study_plan/${data.event_id}`, requestBody, config)
           .then((response) => {
             console.log('Post created successfully!', response.data);
             setVisible(false);
