@@ -1,16 +1,10 @@
 import mysql.connector
 
-cnx = mysql.connector.connect(user='sbp',
-                              password='sbp',
-                              host='127.0.0.1',
-                              database='sbp')
-
 
 class DAO:
-    def __init__(self, table_name, logger, cursor):
+    def __init__(self, table_name, logger, cursor=None):
         self.table_name = table_name
         self.logger = logger
-        self.cursor = cursor
 
     def Get(self, column, filter_by) -> str:
         query = """
@@ -29,6 +23,17 @@ class DAO:
             ORDER BY {}
             LIMIT {}, {}
         """.format(column, self.table_name, filter_by, order_by, limit, offset)
+        self.logger.info(query)
+        return query
+
+
+    def GetLastRow(self, column) -> str:
+        query = """
+            SELECT {}
+            FROM {}
+            ORDER BY {} desc
+            LIMIT 1
+        """.format(column, self.table_name, column)
         self.logger.info(query)
         return query
 
