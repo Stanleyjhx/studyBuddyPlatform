@@ -60,6 +60,7 @@ EditGroupReqeust = {
     },
 }
 
+
 ApproveRequest = {
     "status": {
         "type": utils.ApprovalStatus,
@@ -104,6 +105,3 @@ def GetRequestsResponse(number_of_requests, requests, title="number_of_groups"):
             "requests": requests,
         },
     }
-
-
-

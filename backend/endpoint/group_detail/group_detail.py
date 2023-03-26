@@ -3,8 +3,8 @@ from flask_restful import Resource, Api, fields, marshal_with
 from backend.database.dao.mysql_dao_model import DAO
 from backend.endpoint import utils
 from backend.endpoint.group_detail import vars
-
 from flask import Blueprint, current_app, request
+
 
 app_group_detail = Blueprint(name="app_group_detail", import_name="backend.endpoint.route")
 api_group_detail = Api(app_group_detail)
@@ -136,7 +136,6 @@ class CreateStudyPlan(Resource):
         location = args.get("location") if args.get("location") is not None else ""
         event_description = args.get("description") if args.get("description") is not None else ""
         user_id = int(request.user_id)
-
         dao_object = DAO(utils.table_names["study_plan"], logger=current_app.logger)
         event_attendees_dao_object = DAO(utils.table_names["event_attendees"], logger=current_app.logger)
         cursor = request.cnx.cursor(dictionary=True)
@@ -180,7 +179,6 @@ class EditStudyPlan(Resource):
         edit_type = args.get("edit_type")
         edit_contents = args.get("edit_contents")
         user_id = int(request.user_id)
-
         study_plan_dao_object = DAO(utils.table_names["study_plan"], logger=current_app.logger)
         cursor = request.cnx.cursor(dictionary=True, buffered=True)
 
@@ -327,6 +325,4 @@ api_group_detail.add_resource(GetStudyPlanByGroup, '/get_study_plan_by_group/<in
 api_group_detail.add_resource(GetStudyPlanById, '/get_study_plan_by_id/<int:study_plan_id>')
 api_group_detail.add_resource(CreateStudyPlan, '/create_study_plan/<int:group_id>')
 api_group_detail.add_resource(EditStudyPlan, '/edit_study_plan/<int:study_plan_id>')
-api_group_detail.add_resource(GetGroupMembers, '/get_group_members/<int:group_id>')
-api_group_detail.add_resource(GetEventMembers, '/get_event_members/<int:study_plan_id>')
-api_group_detail.add_resource(AddEventMember, '/add_event_member/<int:study_plan_id>')
+

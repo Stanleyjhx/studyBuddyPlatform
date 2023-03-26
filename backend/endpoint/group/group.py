@@ -1,8 +1,12 @@
+
+import os
 import mysql.connector
 from flask_restful import Resource, Api, fields, marshal_with
 from backend.database.dao.mysql_dao_model import DAO
 from backend.endpoint import utils
 from backend.endpoint.group import vars
+from flask import Blueprint, current_app, request, session
+from backend.database.dao.redis_dao_model import *
 from flask import Blueprint, current_app, request
 
 app_group = Blueprint(name="app_group", import_name="backend.endpoint.route")
@@ -93,7 +97,6 @@ class GetGroups(Resource):
             cursor.close()
             request.cnx.close()
             return result
-
         except mysql.connector.Error as err:
             request.cnx.rollback()
             cursor.close()
@@ -151,13 +154,8 @@ class EditGroup(Resource):
 
         edit_contents = args.get("edit_contents")
         edit_type = args.get("edit_type")
-
-        cursor = request.cnx.cursor(dictionary=True)
-        groups_dao_object = DAO(utils.table_names["groups"], logger=current_app.logger)
-
         try:
             request.cnx.start_transaction()
-
             if edit_type == utils.EditType.Delete:
                 cursor.execute(groups_dao_object.Update(value={"is_deleted": "true"},
                                                         filter_by="group_id = {}".format(group_id)))
@@ -166,7 +164,6 @@ class EditGroup(Resource):
                 current_app.logger.info(args.get("edit_contents"))
                 cursor.execute(groups_dao_object.Update(value=edit_contents,
                                                         filter_by="group_id = {}".format(group_id)))
-
             request.cnx.commit()
             cursor.close()
             request.cnx.close()

@@ -28,6 +28,7 @@ def GetStudyPlanByGroupResponse(number_of_study_plan, study_plan):
     }
 
 
+
 def GetStudyPlanResponse(study_plan, is_a_member):
     return {
         "status": 200,

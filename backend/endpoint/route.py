@@ -10,11 +10,13 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
+
 # register blueprints
 app.register_blueprint(app_group, url_prefix="/group")
 app.register_blueprint(app_group_detail, url_prefix="/group_detail")
 app.register_blueprint(app_invitation, url_prefix="/invitation")
 app.register_blueprint(app_notification, url_prefix="/notification")
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
