@@ -12,6 +12,9 @@ GetStudyPlanByGroupReqeust = {
         "type": int,
         "required": True,
     },
+    "show_deleted": {
+        "type": bool
+    },
 }
 
 
@@ -25,11 +28,13 @@ def GetStudyPlanByGroupResponse(number_of_study_plan, study_plan):
     }
 
 
-def GetStudyPlanResponse(study_plan):
+
+def GetStudyPlanResponse(study_plan, is_a_member):
     return {
         "status": 200,
         "data": {
             "study_plan": study_plan,
+            "is_a_member": is_a_member
         },
     }
 
@@ -76,13 +81,20 @@ EditStudyPlanReqeust = {
     }
 }
 
-GetGroupMembersReqeust = {
-    "limit": {
-        "type": int,
-        "required": True,
-    },
-    "offset": {
-        "type": int,
-        "required": True,
-    },
-}
+
+def GetGroupMembersResponse(group_members_info):
+    return {
+        "status": 200,
+        "data": {
+            "group_members": group_members_info
+        }
+    }
+
+
+def GetEventMembersResponse(event_members_info):
+    return {
+        "status": 200,
+        "data": {
+            "event_members": event_members_info
+        }
+    }

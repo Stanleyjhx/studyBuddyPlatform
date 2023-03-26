@@ -171,9 +171,11 @@ CREATE TABLE `membership_requests` (
   `group_owner_id` bigint NOT NULL,
   `requester_id` bigint NOT NULL,
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '''-1'' for declined. `0` for pending. `1` for accepted.',
+  `apply_reason` string NOT NULL DEFAULT '',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`membership_request_id`) USING BTREE,
+  UNIQUE Ke
   KEY `indexgroup_owner_id` (`group_owner_id`),
   KEY `index_requester_id` (`requester_id`),
   KEY `index_group_id_fk1` (`group_id`),
@@ -187,10 +189,11 @@ CREATE TABLE `membership_requests` (
 -- Records of membership_requests
 -- ----------------------------
 BEGIN;
-INSERT INTO `membership_requests` VALUES (1, 1, 4, 5, 0, '2023-02-28 17:09:24', '2023-02-28 17:12:37');
-INSERT INTO `membership_requests` VALUES (2, 1, 4, 6, 0, '2023-02-28 17:16:31', '2023-02-28 17:16:31');
-INSERT INTO `membership_requests` VALUES (4, 2, 7, 5, 0, '2023-02-28 17:18:28', '2023-02-28 17:18:28');
-INSERT INTO `membership_requests` VALUES (5, 2, 7, 2, 0, '2023-02-28 17:19:05', '2023-02-28 17:19:05');
+INSERT INTO `membership_requests` VALUES (1, 1, 4, 5, 0, '', '2023-02-28 17:09:24', '2023-02-28 17:12:37');
+INSERT INTO `membership_requests` VALUES (2, 1, 4, 6, 0, '', '2023-02-28 17:16:31', '2023-02-28 17:16:31');
+INSERT INTO `membership_requests` VALUES (4, 2, 7, 5, 0, '', '2023-02-28 17:18:28', '2023-02-28 17:18:28');
+INSERT INTO `membership_requests` VALUES (5, 2, 7, 2, 0, '', '2023-02-28 17:19:05', '2023-02-28 17:19:05');
+INSERT INTO `membership_requests` VALUES (6, 1, 4, 7, 0, '', '2023-02-28 17:19:05', '2023-02-28 17:19:05');
 COMMIT;
 
 -- ----------------------------
@@ -199,6 +202,7 @@ COMMIT;
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `user_id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL AUTO_INCREMENT,
   `user_name` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
   `first_name` varchar(100) NOT NULL,
@@ -206,6 +210,7 @@ CREATE TABLE `users` (
   `student_id` varchar(100) NOT NULL,
   `major` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT ' `0` for pending. `1` for accepted.',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
