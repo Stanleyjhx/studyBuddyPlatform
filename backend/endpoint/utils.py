@@ -187,7 +187,7 @@ def get_user_info(user_ids, logger, cursor):
             user_info[user_id] = user_info_redis
 
     if len(user_ids_not_in_redis) > 0:
-        cursor.execute(user_dao_object.Get(column="user_id, user_name, first_name, last_name, student_id,"
+        cursor.execute(user_dao_object.Get(column="user_id, user_name, first_name, last_name, student_id, email"
                                                   "major, description",
                                            filter_by="user_id in ({})".
                                            format(",".join(user_ids_not_in_redis))))

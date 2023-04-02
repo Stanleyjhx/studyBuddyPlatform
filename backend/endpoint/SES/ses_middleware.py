@@ -1,6 +1,7 @@
 from botocore.exceptions import ClientError, WaiterError
 from .vars import verification_email_template,request_result_email_template
 import boto3
+import os
 
 
 class SesService:
