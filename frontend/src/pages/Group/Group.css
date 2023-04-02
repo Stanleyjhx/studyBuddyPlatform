@@ -1,0 +1,5 @@
+.detail__header {
+    display: flex;
+    height: 12px;
+    justify-content: flex-end;
+}
