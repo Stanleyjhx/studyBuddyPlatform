@@ -95,7 +95,7 @@ def SendEmail(email, user_id):
 
     # Generate verification code
     verification_code = utils.generate_verification_code()
-    resp = SesService().send_email_verification(recipient=email,token=verification_code)
+    resp = SesService().send_email_verification(recipient=email, token=verification_code)
     # resp = utils.send_verification_email(email=email, verification_code=verification_code)
     tredis.set(name=verification_code, value=user_id, ex=18000)
     if resp == 200:

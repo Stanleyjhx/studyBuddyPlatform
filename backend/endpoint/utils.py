@@ -1,7 +1,7 @@
 from flask_restful import reqparse
 from enum import Enum
-from backend.database.dao.redis_dao_model import tredis
-from backend.endpoint.register import vars
+from ..database.dao.redis_dao_model import tredis
+from .register import vars
 import boto3
 import random
 import configparser
@@ -16,9 +16,7 @@ class FilterType(Enum):
     FilterByUserID = 3
 
 
-
-from backend.database.dao.mysql_dao_model import DAO
-
+from ..database.dao.mysql_dao_model import DAO
 
 table_names = {
     "groups": "groups",
@@ -59,7 +57,6 @@ def unauthenticated_response():
     }
 
 
-
 def lack_permission_response(user_id):
     return {
         "status": 403,
@@ -73,11 +70,11 @@ def invalid_email_format_response():
         "error": "Please check the format/domain of your email address."
     }
 
+
 def post_success_response():
     return {
         "status": 200,
     }
-
 
 
 def get_parser(params, request_type="get"):
@@ -94,10 +91,8 @@ def get_session_key(uuid):
     return "session_id_{}".format(uuid)
 
 
-
 def get_user_info_key(user_id):
     return "user_id_{}".format(user_id)
-
 
 
 def get_groups_count_key():
@@ -107,6 +102,7 @@ def get_groups_count_key():
 def get_user_id():
     return "user_id"
 
+
 def get_group_info_key(group_id):
     return "group_id_{}".format(group_id)
 
@@ -114,7 +110,6 @@ def get_group_info_key(group_id):
 def validate_session(session_id) -> any:
     user = tredis.get(get_session_key(session_id))
     return user
-
 
 
 def check_email_format(addr):
@@ -177,6 +172,7 @@ def send_verification_email(email, verification_code):
         return response['ResponseMetadata']['HTTPStatusCode']
     except Exception as e:
         return e
+
 
 def get_user_info(user_ids, logger, cursor):
     user_ids_not_in_redis = []
@@ -241,4 +237,3 @@ def duplicated_request_response():
         "status": 300,
         "error": "Duplicated Request",
     }
-
