@@ -31,16 +31,17 @@ class Approve(Resource):
 
         try:
             request.cnx.start_transaction()
-            cursor.execute(group_request_dao_object.Get(filter_by="membership_request_id = {}".format(request_id)))
+            cursor.execute(group_request_dao_object.Get(column="requester_id, group_id",
+                                                        filter_by="membership_request_id = {}".format(request_id)))
             request_info = cursor.fetchone()
             if cursor.rowcount > 0:
-                cursor.execute(group_request_dao_object.Update(value={"status": status},
+                cursor.execute(group_request_dao_object.Update(value={"status": 1 if status == utils.ApprovalStatus.Approve else -1},
                                                                filter_by="membership_request_id = {}".format(
                                                                    request_id)))
                 requester_info = utils.get_user_info(user_ids=[request_info['requester_id']],
                                                      logger=current_app.logger,
                                                      cursor=cursor)
-                _,group_name = utils.get_group_info(group_ids=request_info['group_id'],
+                _, group_name = utils.get_group_info(group_ids=request_info['group_id'],
                                                     logger=current_app.logger,
                                                     cursor=cursor)
                 if status == utils.ApprovalStatus.Approve:

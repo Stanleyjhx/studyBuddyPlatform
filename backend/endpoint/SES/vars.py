@@ -272,7 +272,6 @@ def verification_email_template(token):
 
 
 def request_result_email_template(request_info, status):
-    url = "https://0.0.0.0:3000/notification/verify/"
     subject = "NexUs - Your Request Has Been Updated"
     body_html = """
     <!DOCTYPE html>
@@ -444,7 +443,7 @@ def request_result_email_template(request_info, status):
           <!-- start copy -->
           <tr>
             <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-              <p style="margin: 0;">Tap the button below to see your updated request. If you didn't initiate a request to join """+ request_info['entity_type'] +' '+request_info['entity_name']+""" on <a href="https://192.168.0.100:3000">Nexus</a>, you can safely delete this email.</p>
+              <p style="margin: 0;">Tap the button below to see your updated request. If you didn't initiate a request to join a group on Nexus, you can safely delete this email.</p>
             </td>
           </tr>
           <!-- end copy -->
@@ -458,7 +457,7 @@ def request_result_email_template(request_info, status):
                     <table border="0" cellpadding="0" cellspacing="0">
                       <tr>
                         <td align="center" bgcolor="#1a82e2" style="border-radius: 6px;">
-                          <a href="https://192.168.0.100:3000/" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">See Updated Status</a>
+                          <a href="https://18.139.43.146:3000/" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">See Updated Status</a>
                         </td>
                       </tr>
                     </table>
