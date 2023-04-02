@@ -16,7 +16,7 @@ const Task = () => {
   const [err, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [actualData, setData] = useState([]);
-  const [flag, setFlag] = useState(0);
+  const [flag, setFlag] = useState(1);
   const [selectedRequest, setSelectedRequest] = useState(-1);
 
   const params = useParams();
@@ -56,6 +56,7 @@ const Task = () => {
 
   useEffect(() => {
     fetchData();
+    // setFlag(1);
   }, []);
 
   const tabLabel = ["My Task", "My Request"]
