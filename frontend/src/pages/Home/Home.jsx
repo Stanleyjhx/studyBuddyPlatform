@@ -1,23 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import image from "../../images/campus-background-3.jpg"
 
 const Home = () => {
     return (
-        // <div 
-        //     style= {{
-        //         backgroundImage: `url(${image})`,
-        //         backgroundRepeat: 'no-repeat',
-        //         height: '80vh',
-        //         backgroundSize: "cover",
-        //     }}
-        //     className='home__container'
-        // >
-        //     <div className='home'>
-        //         <Description />
-        //         <h3>lalala</h3>
-        //     </div>
-        // </div>
-        <div></div>
+        <div 
+            style= {{
+                backgroundImage: `url(${image})`,
+                backgroundRepeat: 'no-repeat',
+                height: '80vh',
+                backgroundSize: "cover",
+            }}
+            className='home__container'
+        >
+            <div className='home'>
+                <Description />
+            </div>
+        </div>
     )
 }
 

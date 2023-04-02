@@ -144,7 +144,6 @@ const StudyPlanList = ( {groupId} ) => {
       );
       setPlanlist(res.data.data.study_plan);
       setCachedData(res.data.data.study_plan);
-      console.log(res.data.data.study_plan)
     };
     fetchData();
   }, []);
@@ -202,7 +201,7 @@ const GroupDetail = ( props ) => {
   useEffect(() => {
     const fetchData = async () => {
       const res = await axios.get(
-        `http://192.168.0.132:5000/group/get_groups?limit=0&offset=100&group_id=${groupId}`,
+        `${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/group/get_groups?limit=0&offset=100&group_id=${groupId}`,
         config
       );
       setGroupOverview(res.data.data.groups[0]);

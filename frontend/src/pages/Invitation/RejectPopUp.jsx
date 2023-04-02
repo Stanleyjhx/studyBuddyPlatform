@@ -9,7 +9,7 @@ import cookie from 'react-cookies';
 
 const sessionID = cookie.load("session_id")
 
-const DeletePopUp = ({ visible, setVisible, data}) => {
+const RejectPopUp = ({ visible, setVisible, data}) => {
     const [form] = Form.useForm();
     const config = {
       headers: { Authorization: `Bearer ${sessionID}` }
@@ -19,11 +19,9 @@ const DeletePopUp = ({ visible, setVisible, data}) => {
       form.validateFields().then((values) => {
         // customize post body
         const requestBody = {
-          edit_type: 1,
-          edit_contents: {}
-        }
-        console.log(requestBody.start_time);
-        axios.post(`${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/group_detail/edit_study_plan/${data.event_id}`, requestBody, config)
+          status: -1
+        };
+        axios.post(`${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/invitation/approve/${data}`, requestBody, config)
           .then((response) => {
             console.log('Post created successfully!', response.data);
             setVisible(false);
@@ -31,7 +29,7 @@ const DeletePopUp = ({ visible, setVisible, data}) => {
             window.location.reload(false)
           })
           .catch((error) => {
-            console.error('Error deleting study plan', error);
+            console.error('Error reject the invitation', error);
           });
       })
     };
@@ -44,7 +42,7 @@ const DeletePopUp = ({ visible, setVisible, data}) => {
     return (
       <div>
         <Modal
-        title={`Are you sure you want to cancel this study plan?`}
+        title={`Are you sure you want to reject this invitation?`}
         visible={visible}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -56,4 +54,4 @@ const DeletePopUp = ({ visible, setVisible, data}) => {
     )
 };
 
-export default DeletePopUp;
+export default RejectPopUp;

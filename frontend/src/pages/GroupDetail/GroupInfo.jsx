@@ -1,5 +1,5 @@
 import { React, useState, useEffect }  from 'react';
-import { LikeOutlined, MessageOutlined, StarOutlined, UserOutlined, EditOutlined } from '@ant-design/icons';
+import { LikeOutlined, MessageOutlined, StarOutlined, UserOutlined, EditOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { Avatar, List, Space, Typography, Tooltip, Button, Descriptions, Tag, Popover } from 'antd';
 import TopTab from './TopTab';
 import { useParams } from 'react-router-dom';
@@ -47,6 +47,17 @@ const GroupInfo: React.FC = () => {
     fetchData();
   }, []); 
 
+  const joinGroup = async () => {
+    const requestBody = {
+      apply_reason: ""
+    }
+    const res = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/invitation/apply/${groupId}`,
+      requestBody,
+      config
+    );
+  }
+
   if (groupInfo == undefined) {
       return (
         <div>
@@ -63,11 +74,12 @@ const GroupInfo: React.FC = () => {
           <TopTab tab={"members"} groupId={groupId}/>
       </header>
       <div className='card__header' style={{height:"5%"}}>
+        <Button onClick={joinGroup} disabled={isMember}><PlusSquareOutlined/>Join This Group</Button>
         <Tooltip title="Only Group Members Can Edit Group Information">
-            <Button onClick={showEditGroupModal} disabled={!isMember}><EditOutlined style={{ fontSize:"120%" }} /> Edit Group Information</Button>
-          </Tooltip>
+          <Button onClick={showEditGroupModal} disabled={!isMember}><EditOutlined style={{ fontSize:"120%" }} /> Edit Group Information</Button>
+        </Tooltip>
           <EditGroupPopUp visible={editGroupVisible} setVisible={setEditGroupVisible} data={groupInfo}/>
-        </div>
+      </div>
       <Descriptions  layout="vertical" bordered  style={{margin:"20px"}} >
         <Descriptions.Item label="Group Name"> {`${groupInfo.group_name}`} </Descriptions.Item>
         <Descriptions.Item label="Group Description">{`${groupInfo.group_description}`}</Descriptions.Item>

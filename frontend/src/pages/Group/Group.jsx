@@ -52,7 +52,7 @@ const Group: React.FC = () => {
       onChange: (page) => {
         console.log(page);
       },
-      pageSize: 5,
+      pageSize: 4,
       align: "center"
       }}
       dataSource={actualData}
@@ -135,7 +135,7 @@ const Group: React.FC = () => {
         onChange: (page) => {
           console.log(page);
         },
-        pageSize: 5,
+        pageSize: 4,
         align: "center"
         }}
         dataSource={actualData}
