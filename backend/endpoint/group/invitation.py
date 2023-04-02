@@ -38,24 +38,24 @@ class Approve(Resource):
                 cursor.execute(group_request_dao_object.Update(value={"status": 1 if status == utils.ApprovalStatus.Approve else -1},
                                                                filter_by="membership_request_id = {}".format(
                                                                    request_id)))
-                requester_info = utils.get_user_info(user_ids=[request_info['requester_id']],
+                requester_info = utils.get_user_info(user_ids=[str(request_info['requester_id'])],
                                                      logger=current_app.logger,
                                                      cursor=cursor)
                 _, group_name = utils.get_group_info(group_ids=request_info['group_id'],
-                                                    logger=current_app.logger,
-                                                    cursor=cursor)
+                                                     logger=current_app.logger,
+                                                     cursor=cursor)
                 if status == utils.ApprovalStatus.Approve:
                     cursor.execute(group_members_dao_object.Insert(value={
                         "group_id": request_info['group_id'],
-                        "user_id": requester_info[request_info['requester_id']]['user_id'],
+                        "user_id": requester_info[str(request_info['requester_id'])]['user_id'],
                     }))
-                SesService(logger=current_app.logger).\
+                SesService().\
                     send_email_status_update(
-                    recipient=requester_info[request_info['requester_id']]['student_id']
+                    recipient=requester_info[str(request_info['requester_id'])]['student_id']
                               + '@u.nus.edu',
                     request_info={'entity_type': 'Group',
                                   'entity_name': group_name},
-                    status=int(status)
+                    status=status
                 )
                 request.cnx.commit()
                 cursor.close()

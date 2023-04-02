@@ -26,7 +26,7 @@ class Authenticate(Resource):
         identifier = args.get("identifier")
         password = args.get("password")
         request.cnx.start_transaction()
-        cursor = request.cnx.cursor(dictionary=True)
+        cursor = request.cnx.cursor(dictionary=True, buffered=True)
         auth_dao_object = DAO(utils.table_names["users"], logger=current_app.logger, cursor=cursor)
 
         try:
@@ -48,7 +48,7 @@ class Authenticate(Resource):
                 return vars.unauthenticated_response()
             request.cnx.commit()
             cursor.close()
-            if (result['password'] == password) & (result['status'] == 1):
+            if (result['password'] == password) and (result['status'] == 1):
                 access_token = str(uuid.uuid4())
                 tredis.set(name=utils.get_session_key(access_token), value=result['user_id'], ex=18000)
                 return vars.authenticated_response(access_token)
