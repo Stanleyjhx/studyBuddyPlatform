@@ -193,7 +193,7 @@ def get_user_info(user_ids, logger, cursor):
                                            format(",".join(user_ids_not_in_redis))))
 
         for user_info_not_in_redis in list(cursor.fetchall()):
-            user_info[user_info_not_in_redis['user_id']] = user_info_not_in_redis
+            user_info[str(user_info_not_in_redis['user_id'])] = user_info_not_in_redis
             tredis.hmset(get_user_info_key(user_info_not_in_redis['user_id']), user_info_not_in_redis)
 
     return user_info

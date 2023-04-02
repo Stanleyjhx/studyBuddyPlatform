@@ -152,9 +152,12 @@ class EditGroup(Resource):
     def post(self, group_id):
         # fetch groups in a paginated manner
         args = utils.get_parser(vars.EditGroupReqeust, "post").parse_args()
+        groups_dao_object = DAO(utils.table_names["groups"], logger=current_app.logger)
 
         edit_contents = args.get("edit_contents")
         edit_type = args.get("edit_type")
+        cursor = request.cnx.cursor(dictionary=True, buffered=True)
+
         try:
             request.cnx.start_transaction()
             if edit_type == utils.EditType.Delete:
