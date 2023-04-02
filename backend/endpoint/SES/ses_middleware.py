@@ -4,26 +4,23 @@ import boto3
 
 
 class SesService:
-    def __init__(self, logger):
+    def __init__(self):
         self.ses_client = boto3.client('ses', region_name="ap-southeast-1")
-        self.logger = logger
 
     def verify_email_identity(self, email_address):
         try:
             self.ses_client.verify_email_identity(EmailAddress=email_address)
-            self.logger.info("Started verification of %s.", email_address)
+            #self.logger.info("Started verification of %s.", email_address)
         except ClientError:
-            self.logger.exception("Couldn't start verification of %s.", email_address)
+            #self.logger.exception("Couldn't start verification of %s.", email_address)
             raise
 
     def wait_until_identity_exists(self, identity):
         try:
             waiter = self.ses_client.get_waiter('identity_exists')
-            self.logger.info("Waiting until %s exists.", identity)
             waiter.wait(Identities=[identity])
             return True
         except WaiterError:
-            self.logger.error("Waiting for identity %s failed or timed out.", identity)
             return False
 
     def send_email_verification(self, recipient, token, configure_set=''):
@@ -57,9 +54,9 @@ class SesService:
                 Source=sender,
             )
         except ClientError as e:
-            self.logger.info(e.response['Error']['Message'])
+            return e.response['Error']['Message']
         else:
-            self.logger.info("Email sent! Message ID: {}".format(response['MessageId']))
+            return response['ResponseMetadata']['HTTPStatusCode']
 
     def send_email_status_update(self, recipient, request_info, status):
         sender = "NEXUS <nexus.study.platform@gmail.com>"
@@ -93,8 +90,8 @@ class SesService:
                 Source=sender,
             )
         except ClientError as e:
-            self.logger.info(e.response['Error']['Message'])
+            #self.logger.info(e.response['Error']['Message'])
             return False
         else:
-            self.logger.info("Email sent! Message ID: {}".format(response['MessageId']))
-            return True
+            #self.logger.info("Email sent! Message ID: {}".format(response['MessageId']))
+            return response['ResponseMetadata']['HTTPStatusCode']

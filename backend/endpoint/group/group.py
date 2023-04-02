@@ -70,8 +70,9 @@ class GetGroups(Resource):
                 cursor.execute(groups_members_object.Get(column="group_id",
                                                          filter_by="user_id = {}".format(user_id),
                                                          ))
-                group_ids = [str(i['group_id']) for i in cursor.fetchall()]
-                group_id_filter = "and group_id in ({})".format(','.join(group_ids))
+                groups_id = cursor.fetchall()
+                group_ids = [str(i['group_id']) for i in groups_id]
+                group_id_filter = "and group_id in ({})".format(','.join(group_ids)) if len(groups_id) != 0 else "and 0"
             else:
                 group_id_filter = ""
             cursor.execute(groups_dao_object.GetWithPagination(column="group_id, group_owner, group_name, "

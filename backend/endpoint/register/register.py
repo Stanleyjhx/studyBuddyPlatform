@@ -52,14 +52,17 @@ class CreateUser(Resource):
                 column="user_id"
             ))
             user_id = cursor.fetchone()['user_id']
+
             vars.SendEmail(email=email, user_id=user_id)
             request.cnx.commit()
             cursor.close()
+            request.cnx.close()
             return vars.CreateUserResponse()
 
         except mysql.connector.Error as err:
             request.cnx.rollback()
             cursor.close()
+            request.cnx.close()
             return utils.err_response(err)
 
 
@@ -72,6 +75,7 @@ class VerifyEmail(Resource):
 
         # Check in redis
         code_host = tredis.get(email)
+        request.cnx.close()
         if code_host is not None:
             code_host = str(int(code_host))
             return vars.EmailVerifiedResponse() if code_host == code_client else vars.InvalidCodeResponse()
@@ -100,6 +104,7 @@ class Verify(Resource):
             ))
             request.cnx.commit()
             cursor.close()
+            request.cnx.close()
             return vars.VerifyResponse()
 
         except mysql.connector.Error as err:
@@ -111,18 +116,17 @@ class Verify(Resource):
 
 @app_register.before_request
 def before_request():
-    cnx = mysql.connector.connect(user='root',
-                                  password='qwertyui',
+    cnx = mysql.connector.connect(user='sbp',
+                                  password='sbp',
                                   host='127.0.0.1',
-                                  database='StudyBuddy')
+                                  database='sbp',
+                                  pool_size=32)
     setattr(request, "cnx", cnx)
 
 
 @app_register.after_request
 def after_request(resp):
-    resp.headers['Access-Control-Allow-Origin'] = request.headers['Origin']
-    # resp.headers['Access-Control-Allow-Origin'] = utils.react_ip
-    resp.headers['Access-Control-Allow-Credentials'] = "true"
+    resp.headers['Access-Control-Allow-Origin'] = '*'
     resp.headers['Access-Control-Allow-Method'] = "GET,POST,PUT,DELETE"
     resp.headers['Access-Control-Allow-Headers'] = "Content-Type,Authorization,Origin"
     return resp

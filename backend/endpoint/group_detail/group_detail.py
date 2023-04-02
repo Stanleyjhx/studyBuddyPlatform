@@ -325,4 +325,5 @@ api_group_detail.add_resource(GetStudyPlanByGroup, '/get_study_plan_by_group/<in
 api_group_detail.add_resource(GetStudyPlanById, '/get_study_plan_by_id/<int:study_plan_id>')
 api_group_detail.add_resource(CreateStudyPlan, '/create_study_plan/<int:group_id>')
 api_group_detail.add_resource(EditStudyPlan, '/edit_study_plan/<int:study_plan_id>')
+api_group_detail.add_resource(GetGroupMembers, '/get_group_members/<int:group_id>')
 

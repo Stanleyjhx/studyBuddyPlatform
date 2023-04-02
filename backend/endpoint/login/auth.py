@@ -3,6 +3,7 @@ import uuid
 from flask_restful import Resource, Api, fields, marshal_with
 from backend.database.dao.mysql_dao_model import DAO
 from backend.endpoint.login import vars
+from backend.endpoint import utils
 from flask import Blueprint, current_app, request
 from backend.database.dao.redis_dao_model import *
 
@@ -62,16 +63,17 @@ class Authenticate(Resource):
 
 @app_login.before_request
 def before_request():
-    cnx = mysql.connector.connect(user='root',
-                                  password='qwertyui',
+    cnx = mysql.connector.connect(user='sbp',
+                                  password='sbp',
                                   host='127.0.0.1',
-                                  database='StudyBuddy')
+                                  database='sbp',
+                                  pool_size=32)
     setattr(request, "cnx", cnx)
 
 
 @app_login.after_request
 def after_request(resp):
-    # resp.headers['Access-Control-Allow-Origin'] = request.headers['Origin']
+    resp.headers['Access-Control-Allow-Origin'] = request.headers['Origin']
     resp.headers['Access-Control-Allow-Credentials'] = "true"
     resp.headers['Access-Control-Allow-Method'] = "GET,POST,PUT,DELETE"
     resp.headers['Access-Control-Allow-Headers'] = "Content-Type,Authorization,Origin"

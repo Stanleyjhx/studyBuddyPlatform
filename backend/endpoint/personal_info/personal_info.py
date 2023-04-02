@@ -29,14 +29,17 @@ class GetPersonalInfo(Resource):
                        "DATE_FORMAT(created_at, '%Y-%m-%d %T') as created_at",
                 filter_by="is_deleted = 0 and user_id = {}".format(user_id)))
             if cursor.rowcount == 0:
+                request.cnx.close()
                 return utils.err_response("User_id {} doesn't exist".format(user_id))
             else:
                 result = vars.GetPersonalInfoResponse(cursor.fetchone())
                 cursor.close()
+                request.cnx.close()
                 return result
 
         except mysql.connector.Error as err:
             cursor.close()
+            request.cnx.close()
             return utils.err_response("MySQL facing error : {}".format(err))
 
 
@@ -63,11 +66,13 @@ class EditPersonalInfo(Resource):
 
             request.cnx.commit()
             cursor.close()
+            request.cnx.close()
             return vars.EditPersonalInfoResponse()
 
         except mysql.connector.Error as err:
             request.cnx.rollback()
             cursor.close()
+            request.cnx.close()
             return utils.err_response("MySQL facing error : {}".format(err))
 
 
@@ -75,16 +80,17 @@ class EditPersonalInfo(Resource):
 def before_request():
     current_app.logger.info(request.headers)
     token = request.headers.get("Authorization")
-    cnx = mysql.connector.connect(user='root',
-                                  password='qwertyui',
-                                  host='127.0.0.1',
-                                  database='StudyBuddy')
     if not token:
         return utils.unauthenticated_response()
     user_id = utils.validate_session(token.split()[1])
     if user_id is None:
         return utils.unauthenticated_response()
     else:
+        cnx = mysql.connector.connect(user='sbp',
+                                      password='sbp',
+                                      host='127.0.0.1',
+                                      database='sbp',
+                                      pool_size=32)
         setattr(request, "user_id", user_id)
         setattr(request, "cnx", cnx)
 

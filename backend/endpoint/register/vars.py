@@ -1,5 +1,6 @@
 from backend.database.dao.redis_dao_model import tredis
 from backend.endpoint import utils
+from backend.endpoint.SES.ses_middleware import SesService
 
 CreateUserReqeust = {
     "user_name": {
@@ -94,9 +95,10 @@ def SendEmail(email, user_id):
 
     # Generate verification code
     verification_code = utils.generate_verification_code()
-    resp = utils.send_verification_email(email=email, verification_code=verification_code)
+    resp = SesService().send_email_verification(recipient=email,token=verification_code)
+    # resp = utils.send_verification_email(email=email, verification_code=verification_code)
+    tredis.set(name=verification_code, value=user_id, ex=18000)
     if resp == 200:
-        print(user_id)
         tredis.set(name=verification_code, value=user_id, ex=18000)
     else:
         return utils.err_response(resp)
