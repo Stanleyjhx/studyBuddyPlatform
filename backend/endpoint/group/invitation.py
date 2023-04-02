@@ -129,7 +129,7 @@ class GetRequests(Resource):
             request.cnx.start_transaction()
             cursor.execute(
                 group_request_dao_object.GetWithPagination(
-                    column="group_id, {}, apply_reason, created_at, status, "
+                    column="membership_request_id as request_id, group_id, {}, apply_reason, created_at, status, "
                            "DATE_FORMAT(CONVERT_TZ(created_at,'+08:00','+00:00'), '%Y-%m-%dT%H:%i:%s.000Z') "
                            "as created_at".format(show_role_type),
                     filter_by="{} {}".format("{} = {}".format(role_type, user_id),

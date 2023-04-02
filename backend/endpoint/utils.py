@@ -19,7 +19,7 @@ class FilterType(Enum):
 from ..database.dao.mysql_dao_model import DAO
 
 table_names = {
-    "groups": "groups",
+    "groups": "`groups`",
     "study_plan": "events",
     "group_members": "group_members",
     "users": "users",
