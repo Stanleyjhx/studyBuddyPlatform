@@ -26,10 +26,9 @@ class SesService:
     def send_email_verification(self, recipient, token, configure_set=''):
         sender = "NEXUS <nexus.study.platform@gmail.com>"
         charset = "UTF-8"
-        client = boto3.client('ses', region_name="ap-southeast-1")
         subject, body_html, _ = verification_email_template(token)
         try:
-            response = client.send_email(
+            response = self.ses_client.send_email(
                 Destination={
                     'ToAddresses': [
                         recipient,
@@ -61,11 +60,10 @@ class SesService:
     def send_email_status_update(self, recipient, request_info, status):
         sender = "NEXUS <nexus.study.platform@gmail.com>"
         charset = "UTF-8"
-        client = boto3.client('ses', region_name="ap-southeast-1")
         subject, body_html, body_text = request_result_email_template(request_info=request_info,
                                                                       status=status)
         try:
-            response = client.send_email(
+            response = self.ses_client.send_email(
                 Destination={
                     'ToAddresses': [
                         recipient,
