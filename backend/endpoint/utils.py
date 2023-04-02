@@ -227,7 +227,7 @@ def get_group_info(group_ids, logger, cursor, fetch_one=True):
             cursor.execute(group_dao_object.Get(column="group_owner, group_name, group_id",
                                                 filter_by="group_id in ({})".format(','.join(group_ids))))
         for group_id_in_redis in list(cursor.fetchall()):
-            group_info[group_id_in_redis['group_id']] = group_id_in_redis
+            group_info[str(group_id_in_redis['group_id'])] = group_id_in_redis
             tredis.hmset(get_group_info_key(group_id_in_redis['group_id']), dict(group_id_in_redis))
         return group_info
 
