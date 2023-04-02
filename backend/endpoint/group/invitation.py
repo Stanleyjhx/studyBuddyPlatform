@@ -51,8 +51,7 @@ class Approve(Resource):
                     }))
                 SesService().\
                     send_email_status_update(
-                    recipient=requester_info[str(request_info['requester_id'])]['student_id']
-                              + '@u.nus.edu',
+                    recipient=requester_info[str(request_info['requester_id'])]['email'],
                     request_info={'entity_type': 'Group',
                                   'entity_name': group_name},
                     status=status
